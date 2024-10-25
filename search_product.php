@@ -6,16 +6,6 @@ include('functions/common_function.php');
 session_start();
 ?>
 
-
-<?php
-// Fetch the logged-in users count
-$select_query = "SELECT COUNT(*) AS logged_in_count FROM user_table WHERE login_status = 1";
-$result_query = mysqli_query($con, $select_query);
-$row = mysqli_fetch_assoc($result_query);
-$logged_in_count = $row['logged_in_count'];
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +24,7 @@ $logged_in_count = $row['logged_in_count'];
     <link rel="stylesheet" href="./style.css">
 
     <!-- Addressbar icon -->
-    <link rel="icon" href="./images//logo.jpg" type="image/icon type">
+    <link rel="icon" href="images/newlogo.jpg" type="image/icon type">
 
     <style>
       /* footer section */
@@ -199,7 +189,7 @@ h2{
 }
 
 .slider{
-  height: 190px;
+  height: 150px;
   margin: auto;
   overflow: hidden;
   position: relative;
@@ -226,7 +216,6 @@ h2{
     width: calc(31px * 15);
   }
 }
-
     </style>
 </head>
 <body>
@@ -261,7 +250,7 @@ h2{
         </li>
         
       </ul>
-      <form class="d-flex" action="search_product.php" method="get">
+      <form class="d-flex" action="" method="get">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
         name="search_data">
         <!-- <button class="btn btn-outline-light" type="submit">Search</button> -->
@@ -270,14 +259,13 @@ h2{
     </div>
   </div>
 </nav>
+    
 
- 
 <!-- second child -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
   <ul class="navbar-nav me-auto">
-
+  
         <?php
-
         if(!isset($_SESSION['username'])){
           echo "<li class='nav-item'>
           <a class='nav-link' href='#'>Welcome Guest</a>
@@ -311,35 +299,6 @@ h2{
   <h3 class="text-center" style='color:red; font-weight:bolder; font-size:90px;'>My<span  style='font-size:70px; font-weight:bold; color:#585858;'>Wedding</span></h3>
   <p class="text-center" style='font-weight:bold; color:#5F0A0A; font-size:20px;'>This is the best place to find your favoures.</p>
 </div>
-
-<!-- Logged-in Users Count Box -->
-<div class="bg-light text-center py-3">
-    <h4 class="text-info">Connected Audience 
-        <span class="badge bg-success" id="userCount">0</span>
-    </h4>
-</div>
-
-<!-- JavaScript for Count Animation -->
-<script>
-    // Initialize variables
-    const targetCount = <?php echo $logged_in_count; ?>;
-    const duration = 60000; // 10 seconds
-    const interval = 75; // 75ms intervals for smooth animation
-    const increment = Math.ceil(targetCount / (duration / interval));
-    
-    let currentCount = 0;
-    
-    const counter = setInterval(() => {
-        currentCount += increment;
-        if (currentCount >= targetCount) {
-            currentCount = targetCount; // Ensure it doesn't exceed the target
-            clearInterval(counter);
-        }
-        document.getElementById('userCount').innerText = currentCount;
-    }, interval);
-</script>
-
-
 
 <!-- fourth child -->
 <div class="row px-1">
@@ -375,11 +334,11 @@ h2{
         //   }
 
         // calling function
-        getproducts();
+        // getproducts();
+        // get_all_products();
+        search_product();
         get_unique_categories();
         get_unique_brands();
-        // $ip = getIPAddress();  
-        // echo 'User Real IP Address - '.$ip; 
         ?>
 
 
@@ -399,12 +358,11 @@ h2{
   </div> 
   <!-- column end -->
 </div>
-
   <div class="col-md-2 bg-secondary p-0">
     <!-- brands to be displayed -->
     <ul class="navbar-nav me-auto text-center">
       <li class="nav-item bg-info">
-        <a href="#" class="nav-link text-light"><h4>Brands</h4></a>
+        <a href="#" class="nav-link text-light"><h4>Delivery Brand</h4></a>
       </li>
 
       <?php
@@ -481,22 +439,22 @@ h2{
         <div class="slider">
             <div class="slide-track">
                 <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
+                    <img src="main_image/logo.jpg" height="130" width="250" alt="">
                 </div>
                 <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
+                    <img src="main_image/logo.jpg" height="130" width="250" alt="">
                 </div>
                 <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
+                    <img src="main_image/logo.jpg" height="130" width="250" alt="">
                 </div>
                 <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
+                    <img src="main_image/logo.jpg" height="130" width="250" alt="">
                 </div>
                 <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
+                    <img src="main_image/logo.jpg" height="130" width="250" alt="">
                 </div>
                 <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
+                    <img src="main_image/logo.jpg" height="130" width="250" alt="">
                 </div>
             </div>
         </div>
@@ -508,7 +466,7 @@ h2{
 <footer class="footer">
         <div class="footer-left">
             <a href="index.php">
-                <img src="images//logo.jpg" alt="">
+                <img src="main_image/logo.jpg" alt="">
             </a>
             <p>MyWedding website is helped to plan your special events with best solutions.</p>
 
@@ -534,7 +492,7 @@ h2{
                 <ul class="box">
                     <li><a href="index.php">Home</a></li>
                     <li><a href="about.php">About</a></li>
-                    <li><a href="contact.php">Contact</a></li>
+                    <li><a href="#">Contact</a></li>
                 </ul>
             </li>
             <li>

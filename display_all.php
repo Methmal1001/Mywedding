@@ -6,22 +6,12 @@ include('functions/common_function.php');
 session_start();
 ?>
 
-
-<?php
-// Fetch the logged-in users count
-$select_query = "SELECT COUNT(*) AS logged_in_count FROM user_table WHERE login_status = 1";
-$result_query = mysqli_query($con, $select_query);
-$row = mysqli_fetch_assoc($result_query);
-$logged_in_count = $row['logged_in_count'];
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyWedding</title>
+    <title>Sharmia Super</title>
     <!-- bootstrap link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" 
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" 
@@ -32,201 +22,12 @@ $logged_in_count = $row['logged_in_count'];
   
     <!-- css -->
     <link rel="stylesheet" href="./style.css">
-
-    <!-- Addressbar icon -->
-    <link rel="icon" href="./images//logo.jpg" type="image/icon type">
+    <link rel="icon" href="images/newlogo.jpg" type="image/icon type">
 
     <style>
-      /* footer section */
-*,*:before,*:after{
-    box-sizing: border-box;
-}
-
-/* body{
-    font-family: poppins;
-    margin: 0;
-    display: grid;
-    font-size: 14px;
-} */
-
-.footer{
-    display: -webkit-flex;
-    display: -moz-flex;
-    display: -ms-flex;
-    display: -o-flex;
-    display: flex;
-    flex-flow: row wrap;
-    padding: 50px;
-    color: #fff;
-    background-color: #05506B;
-}
-
-.footer > *{
-    flex: 1 100%;
-}
-
-.footer-left{
-    margin-right: 1.25rem;
-    margin-bottom: 2rem;
-}
-
-.footer-left img{
-    background: white;
-    margin-bottom: 15px;
-    width: 100px;
-}
-
-h2{
-    font-weight: 600;
-    font-size: 17px;
-}
-
-.footer ul{
-    list-style: none;
-    padding-left: 0;
-}
-
-.footer li{
-    line-height: 2rem;
-}
-
-.footer a{
-    text-decoration: none;
-}
-
-.footer-right{
-    display: -webkit-flex;
-    display: -moz-flex;
-    display: -ms-flex;
-    display: -o-flex;
-    display: flex;
-    flex-flow: row wrap;
-}
-
-.footer-right > *{
-    flex: 1 50%;
-    margin-right: 1.25rem;
-}
-
-.box a{
-    color: #999;
-}
-
-.box a:hover{
-    color: #fff0f0;
-}
-
-.footer-bottom{
-    text-align: center;
-    color: #f1f1f1;
-    padding-top: 50px;
-}
-
-.footer-left p{
-    padding-right: 20%;
-    color: #e2e1e1;
-    margin: 15px 0px;
-}
-
-.socials a{
-    background: #364a62;
-    width: 40px;
-    height: 40px;
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.socials a:hover{
-    background: #3b4757;
-}
-
-.socials a i{
-    color: #808585ee;
-    padding: 10px 12px;
-    font-size: 20px;
-}
-
-.socials a i:hover{
-    color: #ffffff;
-}
-
-@media screen and (min-width: 600px){
-    .footer-right > *{
-        flex: 1;
-    }
-    .footer-left{
-        flex: 1 0px;
-    }
-    .footer-right{
-        flex: 2 0px;
-    }
-}
-
-@media (max-width: 600px){
-    .footer{
-        padding: 15px;
-    }
-    main{
-        font-size: 55px;
-    }
-}
-
-
-/* Sponser advertisement */
-
-.add-title{
-  text-align: center;
-  font-size: 25px;
-  font-weight: bolder;
-  font-family: sans-serif;
-  padding: 50px 0px;
-  margin-bottom: 15px;
-  margin-top: 30px;
-  color: darkred;
-}
-.sponser{
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes scroll{
-  100%{
-    transform: translateX(0);
-  }
-  100%{
-    transform: translateX(calc(-200px * 7));
-  }
-}
-
-.slider{
-  height: 190px;
-  margin: auto;
-  overflow: hidden;
-  position: relative;
-  width: auto;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.slider .slide-track{
-  animation: scroll 40s linear infinite;
-  display: flex;
-  width: calc(31px * 15);
-}
-
-.slider .slide-track .slide{
-  height: 150px;
-  width: 150px;
-  margin-right: 150px;
-}
-
-@media(max-width:798px){
-  .slider .slide-track{
-    animation: scroll 40s linear infinite;
-    width: calc(31px * 15);
-  }
-}
-
+      body{
+            overflow-X: hidden;
+        }
     </style>
 </head>
 <body>
@@ -235,7 +36,7 @@ h2{
         <!-- first child -->
         <nav class="navbar navbar-expand-lg navbar-light bg-info">
   <div class="container-fluid">
-    <img src="images//logo.jpg" alt="" class="logo">
+    <img src="./images/logo.jpg" alt="" class="logo">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -247,18 +48,27 @@ h2{
         <li class="nav-item">
           <a class="nav-link" href="display_all.php">Products</a>
         </li>
+        <?php
+        
+        if(isset($_SESSION['username'])){
+          echo "<li class='nav-item'>
+          <a class='nav-link' href='./users_area/profile.php'>My Account</a>
+        </li>";
+        }else{
+          echo "<li class='nav-item'>
+          <a class='nav-link' href='./users_area/user_registration.php'>Register</a>
+        </li>";
+        }
+        
+        ?>
         <li class="nav-item">
           <a class="nav-link" href="about.php">About Us</a>
         </li>
+        
         <li class="nav-item">
           <a class="nav-link" href="contact.php">Contact</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="./users_area/profile.php">My Account</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#publish">Publish Ad</a>
-        </li>
+        
         
       </ul>
       <form class="d-flex" action="search_product.php" method="get">
@@ -270,8 +80,9 @@ h2{
     </div>
   </div>
 </nav>
+    
 
- 
+
 <!-- second child -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
   <ul class="navbar-nav me-auto">
@@ -305,41 +116,11 @@ h2{
 </ul>
 </nav>
 
-
 <!-- third child -->
 <div class="bg-light">
   <h3 class="text-center" style='color:red; font-weight:bolder; font-size:90px;'>My<span  style='font-size:70px; font-weight:bold; color:#585858;'>Wedding</span></h3>
   <p class="text-center" style='font-weight:bold; color:#5F0A0A; font-size:20px;'>This is the best place to find your favoures.</p>
 </div>
-
-<!-- Logged-in Users Count Box -->
-<div class="bg-light text-center py-3">
-    <h4 class="text-info">Connected Audience 
-        <span class="badge bg-success" id="userCount">0</span>
-    </h4>
-</div>
-
-<!-- JavaScript for Count Animation -->
-<script>
-    // Initialize variables
-    const targetCount = <?php echo $logged_in_count; ?>;
-    const duration = 60000; // 10 seconds
-    const interval = 75; // 75ms intervals for smooth animation
-    const increment = Math.ceil(targetCount / (duration / interval));
-    
-    let currentCount = 0;
-    
-    const counter = setInterval(() => {
-        currentCount += increment;
-        if (currentCount >= targetCount) {
-            currentCount = targetCount; // Ensure it doesn't exceed the target
-            clearInterval(counter);
-        }
-        document.getElementById('userCount').innerText = currentCount;
-    }, interval);
-</script>
-
-
 
 <!-- fourth child -->
 <div class="row px-1">
@@ -378,8 +159,6 @@ h2{
         getproducts();
         get_unique_categories();
         get_unique_brands();
-        // $ip = getIPAddress();  
-        // echo 'User Real IP Address - '.$ip; 
         ?>
 
 
@@ -399,12 +178,11 @@ h2{
   </div> 
   <!-- column end -->
 </div>
-
   <div class="col-md-2 bg-secondary p-0">
     <!-- brands to be displayed -->
     <ul class="navbar-nav me-auto text-center">
       <li class="nav-item bg-info">
-        <a href="#" class="nav-link text-light"><h4>Brands</h4></a>
+        <a href="#" class="nav-link text-light"><h4>Delivery Brand</h4></a>
       </li>
 
       <?php
@@ -472,87 +250,13 @@ h2{
   </div>
 </div>
 
-<!-- Sponser advertisement -->
-
-<div class="add-title">
-        <h1>Our Sponsers</h1>
-    </div>
-    
-        <div class="slider">
-            <div class="slide-track">
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 <!-- last child -->
-<!-- Footer Section -->
-<footer class="footer">
-        <div class="footer-left">
-            <a href="index.php">
-                <img src="images//logo.jpg" alt="">
-            </a>
-            <p>MyWedding website is helped to plan your special events with best solutions.</p>
-
-                <div class="socials">
-                    <a href="navigation.html"><i class="fa-brands fa-square-facebook"></i></a>
-                    <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
-                    <!-- <a href="#"><i class="fa-brands fa-youtube"></i></a> -->
-                </div>
-        </div>
-
-        <ul class="footer-right">
-            <li>
-                <h2>SERVICES</h2>
-
-                <ul class="box">
-                    <li><a href="#">24/7 Support and Monitoring</a></li>
-                    <li><a href="#">Best Market place</a></li>
-                </ul>
-            </li>
-            <li class="features">
-                <h2>Useful Links</h2>
-
-                <ul class="box">
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="about.php">About</a></li>
-                    <li><a href="contact.php">Contact</a></li>
-                </ul>
-            </li>
-            <li>
-                <h2>CONTACT US</h2>
-
-                <ul class="box">
-                    <li><a href="#">+94 xx xxx xxxx</a></li>
-                    <li><a href="#">mywedding@gmail.com</a></li>
-                </ul>
-            </li>
-        </ul>
-
-        <div class="footer-bottom">
-            <p>All Right reserved by &copy; MyWedding.com</p>
-        </div>
-    </footer>
-  </div>
-  </div>
+<?php
+    include("./includes/footer.php")
+?>
+</div>
+  
 
 <!-- bootstrap js link -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" 

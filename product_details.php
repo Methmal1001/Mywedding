@@ -6,16 +6,6 @@ include('functions/common_function.php');
 session_start();
 ?>
 
-
-<?php
-// Fetch the logged-in users count
-$select_query = "SELECT COUNT(*) AS logged_in_count FROM user_table WHERE login_status = 1";
-$result_query = mysqli_query($con, $select_query);
-$row = mysqli_fetch_assoc($result_query);
-$logged_in_count = $row['logged_in_count'];
-?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,10 +24,10 @@ $logged_in_count = $row['logged_in_count'];
     <link rel="stylesheet" href="./style.css">
 
     <!-- Addressbar icon -->
-    <link rel="icon" href="./images//logo.jpg" type="image/icon type">
+    <link rel="icon" href="main_image/logo.jpg" type="image/icon type">
 
     <style>
-      /* footer section */
+        /* footer section */
 *,*:before,*:after{
     box-sizing: border-box;
 }
@@ -170,63 +160,6 @@ h2{
         font-size: 55px;
     }
 }
-
-
-/* Sponser advertisement */
-
-.add-title{
-  text-align: center;
-  font-size: 25px;
-  font-weight: bolder;
-  font-family: sans-serif;
-  padding: 50px 0px;
-  margin-bottom: 15px;
-  margin-top: 30px;
-  color: darkred;
-}
-.sponser{
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes scroll{
-  100%{
-    transform: translateX(0);
-  }
-  100%{
-    transform: translateX(calc(-200px * 7));
-  }
-}
-
-.slider{
-  height: 190px;
-  margin: auto;
-  overflow: hidden;
-  position: relative;
-  width: auto;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.slider .slide-track{
-  animation: scroll 40s linear infinite;
-  display: flex;
-  width: calc(31px * 15);
-}
-
-.slider .slide-track .slide{
-  height: 150px;
-  width: 150px;
-  margin-right: 150px;
-}
-
-@media(max-width:798px){
-  .slider .slide-track{
-    animation: scroll 40s linear infinite;
-    width: calc(31px * 15);
-  }
-}
-
     </style>
 </head>
 <body>
@@ -271,7 +204,7 @@ h2{
   </div>
 </nav>
 
- 
+
 <!-- second child -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
   <ul class="navbar-nav me-auto">
@@ -299,12 +232,8 @@ h2{
         }
         
         ?>
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="./users_area/user_login.php">Login</a>
-        </li> -->
 </ul>
 </nav>
-
 
 <!-- third child -->
 <div class="bg-light">
@@ -312,40 +241,40 @@ h2{
   <p class="text-center" style='font-weight:bold; color:#5F0A0A; font-size:20px;'>This is the best place to find your favoures.</p>
 </div>
 
-<!-- Logged-in Users Count Box -->
-<div class="bg-light text-center py-3">
-    <h4 class="text-info">Connected Audience 
-        <span class="badge bg-success" id="userCount">0</span>
-    </h4>
-</div>
-
-<!-- JavaScript for Count Animation -->
-<script>
-    // Initialize variables
-    const targetCount = <?php echo $logged_in_count; ?>;
-    const duration = 60000; // 10 seconds
-    const interval = 75; // 75ms intervals for smooth animation
-    const increment = Math.ceil(targetCount / (duration / interval));
-    
-    let currentCount = 0;
-    
-    const counter = setInterval(() => {
-        currentCount += increment;
-        if (currentCount >= targetCount) {
-            currentCount = targetCount; // Ensure it doesn't exceed the target
-            clearInterval(counter);
-        }
-        document.getElementById('userCount').innerText = currentCount;
-    }, interval);
-</script>
-
-
-
 <!-- fourth child -->
 <div class="row px-1">
   <div class="col-md-10">
     <!-- products -->
       <div class="row">
+
+      <!-- card -->
+      <!-- <div class="col-md-4">
+        
+        <div class='card'>
+              <img src='./images/pep1.jpg' class='card-img-top' alt='$product_title'>
+              <div class='card-body'>
+                <h5 class='card-title'>$product_title</h5>
+                <p class='card-text'>$product_description</p>
+                <a href='#' class='btn btn-info'>Add to cart</a>
+                <a href='product_details.php?product_id=$product_id' class='btn btn-secondary'>View more</a>
+              </div>
+            </div>
+      </div> -->
+
+      <!-- <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="text-center text-info mb-4">Related Products</h4>
+            </div>
+            <div class="col-md-6">
+            <img src='./images/cola2.jpg' class='card-img-top' alt='$product_title'>
+            </div>
+            <div class="col-md-6">
+            <img src='./images/cola2.jpg' class='card-img-top' alt='$product_title'>
+            </div>
+        </div>
+      </div> -->
+
         <!-- fetching products -->
         <?php
         //   $select_query = "SELECT * FROM products order by brand() limit 0,9";
@@ -375,12 +304,12 @@ h2{
         //   }
 
         // calling function
-        getproducts();
+        // getproducts();
+        view_details();
         get_unique_categories();
         get_unique_brands();
-        // $ip = getIPAddress();  
-        // echo 'User Real IP Address - '.$ip; 
         ?>
+
 
 
         <!-- <div class="col-md-4 mb-2">
@@ -399,108 +328,9 @@ h2{
   </div> 
   <!-- column end -->
 </div>
-
-  <div class="col-md-2 bg-secondary p-0">
-    <!-- brands to be displayed -->
-    <ul class="navbar-nav me-auto text-center">
-      <li class="nav-item bg-info">
-        <a href="#" class="nav-link text-light"><h4>Brands</h4></a>
-      </li>
-
-      <?php
-      //   $select_brands="Select * from brands ";
-      //   $result_brands=mysqli_query($con,$select_brands);
-      //   // $row_data=mysqli_fetch_assoc($result_brands);
-      //   // echo $row_data['brand_title'];
-
-      //   while($row_data=mysqli_fetch_assoc($result_brands)){
-      //     $brand_title = $row_data['brand_title'];
-      //     $brand_id = $row_data['brand_id']; 
-      //     echo "<li class='nav-item'>
-      //               <a href='index.php?brand=$brand_id' class='nav-link text-light'>$brand_title</a>
-      //           </li>";
-      // }
-      
-      getbrands();
-      ?>
-
-      <!-- <li class="nav-item">
-        <a href="#" class="nav-link text-light">Brand1</a>
-      </li> -->
-    </ul>
-
-    <!-- categories to be displayed -->
-    <ul class="navbar-nav me-auto text-center">
-      <li class="nav-item bg-info">
-        <a href="#" class="nav-link text-light"><h4>Categories</h4></a>
-      </li>
-
-      <?php
-      //   $select_categories="Select * from categories ";
-      //   $result_categories=mysqli_query($con,$select_categories);
-      //   // $row_data=mysqli_fetch_assoc($result_brands);
-      //   // echo $row_data['brand_title'];
-
-      //   while($row_data=mysqli_fetch_assoc($result_categories)){
-      //     $category_title = $row_data['category_title'];
-      //     $category_id = $row_data['category_id'];
-      //     echo "<li class='nav-item'>
-      //               <a href='index.php?category=$category_id' class='nav-link text-light'>$category_title</a>
-      //           </li>";
-      // }
-      
-      getcategories();
-      ?>
-
-      <!-- <li class="nav-item">
-        <a href="#" class="nav-link text-light">category1</a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link text-light">category2</a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link text-light">category3</a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link text-light">category4</a>
-      </li>
-      <li class="nav-item">
-        <a href="#" class="nav-link text-light">category5</a>
-      </li> -->
-    </ul>
-
-  </div>
+  
 </div>
 
-<!-- Sponser advertisement -->
-
-<div class="add-title">
-        <h1>Our Sponsers</h1>
-    </div>
-    
-        <div class="slider">
-            <div class="slide-track">
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-                <div class="slide">
-                    <img src="./images//logo.jpg" height="130" width="250" alt="">
-                </div>
-            </div>
-        </div>
-    </div>
 
 
 <!-- last child -->
@@ -508,7 +338,7 @@ h2{
 <footer class="footer">
         <div class="footer-left">
             <a href="index.php">
-                <img src="images//logo.jpg" alt="">
+                <img src="main_image/logo.jpg" alt="">
             </a>
             <p>MyWedding website is helped to plan your special events with best solutions.</p>
 
@@ -551,8 +381,6 @@ h2{
             <p>All Right reserved by &copy; MyWedding.com</p>
         </div>
     </footer>
-  </div>
-  </div>
 
 <!-- bootstrap js link -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" 
