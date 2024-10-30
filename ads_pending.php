@@ -1,63 +1,128 @@
 <?php
-// Include the database connection file
+// Include the database connection
 include('../includes/connect.php');
 
-// Handle the form submission for updating set date
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $product_id = $_POST['product_id'];
-    $set_date = $_POST['set_date'];
+// Handle product confirmation and update in the products table
+if (isset($_GET['confirm_product_id'])) {
+    $product_id = $_GET['confirm_product_id'];
 
-    // Update the set_date in the database
-    $update_query = "UPDATE orders_pending SET set_date = ? WHERE product_id = ?";
-    $stmt = $con->prepare($update_query);
-    $stmt->bind_param("si", $set_date, $product_id); // "si" means string and integer types
+    // Start a transaction to ensure data consistency
+    $con->begin_transaction();
 
-    if ($stmt->execute()) {
-        echo "<script>alert('Set date updated successfully.'); window.location='ads_pending.php';</script>";
-    } else {
-        echo "<script>alert('Error updating set date: " . $stmt->error . "'); window.location='ads_pending.php';</script>";
+    try {
+        // Step 1: Update the status to 1 in the orders_pending table
+        $update_status_query = "UPDATE orders_pending SET status = 1 WHERE product_id = ?";
+        $stmt_status = $con->prepare($update_status_query);
+
+        if (!$stmt_status) {
+            die("Prepare failed for status update: " . $con->error);
+        }
+
+        $stmt_status->bind_param("i", $product_id);
+        $stmt_status->execute();
+
+        // Step 2: Get product details from orders_pending
+        $get_product_details = "
+            SELECT product_id, title, product_image1, product_email, product_contact, date, status 
+            FROM orders_pending WHERE product_id = ?";
+        $stmt_details = $con->prepare($get_product_details);
+
+        if (!$stmt_details) {
+            die("Prepare failed for fetching product details: " . $con->error);
+        }
+
+        $stmt_details->bind_param("i", $product_id);
+        $stmt_details->execute();
+        $result_details = $stmt_details->get_result();
+
+        if ($result_details->num_rows > 0) {
+            $product = $result_details->fetch_assoc();
+
+            // Step 3: Insert or update product in the products table
+            $insert_product_query = "
+                INSERT INTO products (product_id, product_title, product_description, product_keywords, 
+                                      category_id, brand_id, product_image1, product_image2, product_image3, 
+                                      product_email, product_contact, product_price, district, date, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE 
+                    product_title = VALUES(product_title),
+                    product_description = VALUES(product_description),
+                    product_keywords = VALUES(product_keywords),
+                    category_id = VALUES(category_id),
+                    brand_id = VALUES(brand_id),
+                    product_image1 = VALUES(product_image1),
+                    product_image2 = VALUES(product_image2),
+                    product_image3 = VALUES(product_image3),
+                    product_email = VALUES(product_email),
+                    product_contact = VALUES(product_contact),
+                    product_price = VALUES(product_price),
+                    district = VALUES(district),
+                    date = VALUES(date),
+                    status = VALUES(status)";
+
+            $stmt_insert_product = $con->prepare($insert_product_query);
+
+            if (!$stmt_insert_product) {
+                die("Prepare failed for product insert: " . $con->error);
+            }
+
+            // Assigning placeholders/defaults for missing columns
+            $product_description = "Description not available";
+            $product_keywords = "No keywords";
+            $category_id = 0; // Assuming 0 as default category
+            $brand_id = 0;    // Assuming 0 as default brand
+            $product_image2 = ''; // No second image
+            $product_image3 = ''; // No third image
+            $product_price = 0.0; // Default price
+            $district = "Unknown"; // Default district
+
+            $stmt_insert_product->bind_param(
+                "isssiiissssdssi",
+                $product['product_id'],
+                $product['title'],
+                $product_description,
+                $product_keywords,
+                $category_id,
+                $brand_id,
+                $product['product_image1'],
+                $product_image2,
+                $product_image3,
+                $product['product_email'],
+                $product['product_contact'],
+                $product_price,
+                $district,
+                $product['date'],
+                $product['status']
+            );
+
+            $stmt_insert_product->execute();
+
+            echo "<script>alert('Product confirmed and updated successfully.'); 
+                  window.location='ads_pending.php';</script>";
+        } else {
+            echo "<script>alert('No product found with this ID.'); 
+                  window.location='ads_pending.php';</script>";
+        }
+
+        // Commit the transaction
+        $con->commit();
+
+        // Close statements
+        $stmt_status->close();
+        $stmt_details->close();
+        $stmt_insert_product->close();
+
+    } catch (Exception $e) {
+        // Rollback the transaction on error
+        $con->rollback();
+        echo "<script>alert('Error: " . $e->getMessage() . "');</script>";
     }
-
-    $stmt->close();
 }
 
-// Automatically delete expired products and their related data
-$current_time = new DateTime();
-$current_time_formatted = $current_time->format('Y-m-d H:i:s');
-
-// Start transaction
-$con->begin_transaction();
-
-try {
-    // First delete from orders_pending
-    $delete_orders_query = "DELETE FROM orders_pending WHERE set_date < ?";
-    $stmt_delete_orders = $con->prepare($delete_orders_query);
-    $stmt_delete_orders->bind_param("s", $current_time_formatted);
-    $stmt_delete_orders->execute();
-
-    // Then delete from products based on product_id of deleted orders
-    $delete_products_query = "DELETE FROM products WHERE product_id IN (SELECT product_id FROM orders_pending WHERE set_date < ?)";
-    $stmt_delete_products = $con->prepare($delete_products_query);
-    $stmt_delete_products->bind_param("s", $current_time_formatted);
-    $stmt_delete_products->execute();
-
-    // Commit transaction
-    $con->commit();
-    
-    // Close statements
-    $stmt_delete_orders->close();
-    $stmt_delete_products->close();
-} catch (Exception $e) {
-    // Rollback transaction in case of error
-    $con->rollback();
-    echo "<script>alert('Error deleting expired products: " . $e->getMessage() . "');</script>";
-}
-
-// Fetch all pending orders
-$get_products = "SELECT product_id, title, product_image1, product_email, product_contact, date, set_date, status FROM `orders_pending`";
+// Fetch all pending orders (for displaying in the table)
+$get_products = "SELECT product_id, title, product_image1, product_email, product_contact, date, set_date, status FROM orders_pending";
 $result = mysqli_query($con, $get_products);
 
-// Check if the query was successful
 if (!$result) {
     die("Query Failed: " . mysqli_error($con));
 }
@@ -90,21 +155,16 @@ if (!$result) {
         $product_email = $row['product_email'];
         $product_contact = $row['product_contact'];
         $date = $row['date'];
-        $set_date = $row['set_date']; // Retrieve the manual set date
+        $set_date = $row['set_date'];
         $status = $row['status'] == 0 ? 'Pending' : 'Confirmed';
 
-        // Active time calculation
-        $current_time = new DateTime(); // Current date and time
-        $set_date_time = new DateTime($set_date); // Set date from the database
+        $current_time = new DateTime();
+        $set_date_time = new DateTime($set_date);
 
-        // Check if the set date has passed
         if ($set_date_time < $current_time) {
             $active_time = 'Expired';
         } else {
-            // Calculate the remaining time
             $interval = $current_time->diff($set_date_time);
-
-            // Format the remaining time to display
             $active_time = sprintf('%d days, %d hours, %d minutes left', 
                                     $interval->d, 
                                     $interval->h, 
@@ -122,13 +182,7 @@ if (!$result) {
             <td><?php echo $product_contact; ?></td>
             <td><?php echo $product_email; ?></td>
             <td><?php echo $date; ?></td>
-            <td>
-                <form action="" method="POST" class="form-inline">
-                    <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
-                    <input type="datetime-local" name="set_date" value="<?php echo $set_date; ?>" class="form-control mr-2" required>
-                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                </form>
-            </td>
+            <td><?php echo $set_date; ?></td>
             <td><?php echo $active_time; ?></td>
             <td><?php echo $status; ?></td>
             <td>
@@ -149,7 +203,6 @@ if (!$result) {
             </td>
         </tr>
 
-        <!-- Delete Confirmation Modal -->
         <div class="modal fade" id="deleteModal<?php echo $product_id; ?>" 
              tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -174,6 +227,5 @@ if (!$result) {
     </tbody>
 </table>
 
-<!-- Include Bootstrap JS and jQuery for modals -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
