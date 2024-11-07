@@ -63,7 +63,7 @@ if (isset($_GET['confirm_product_id'])) {
 
             // Bind the fetched data directly to the insert query
             $stmt_insert->bind_param(
-                "isssiisssssdssi",
+                "isssiisssssdssi",     // ** Details format as string, int or other
                 $product['product_id'], 
                 $product['product_title'], 
                 $product['product_description'], 
@@ -121,6 +121,42 @@ if (isset($_GET['confirm_product_id'])) {
     }
 }
 
+// Handle product deletion
+if (isset($_GET['delete_product_id'])) {
+    $product_id_to_delete = $_GET['delete_product_id'];
+
+    // Start a transaction to ensure data consistency
+    $con->begin_transaction();
+
+    try {
+        // Delete the product from the orders_pending table
+        $delete_query = "DELETE FROM orders_pending WHERE product_id = ?";
+        $stmt_delete = $con->prepare($delete_query);
+
+        if (!$stmt_delete) {
+            die("Prepare failed: " . $con->error);
+        }
+
+        $stmt_delete->bind_param("i", $product_id_to_delete);
+
+        if (!$stmt_delete->execute()) {
+            echo "<script>console.log('Error in product deletion: " . $stmt_delete->error . "');</script>";
+        } else {
+            echo "<script>alert('Product deleted successfully.'); window.location='ads_pending.php';</script>";
+        }
+
+        // Commit the transaction
+        $con->commit();
+
+        // Close the prepared statement
+        $stmt_delete->close();
+    } catch (Exception $e) {
+        // Rollback the transaction on error
+        $con->rollback();
+        echo "<script>alert('Error: " . $e->getMessage() . "');</script>";
+    }
+}
+
 // Fetch all pending orders (for displaying in the table)
 $get_products = "
     SELECT product_id, title, product_image1, product_email, product_contact, 
@@ -146,6 +182,7 @@ if (!$result) {
             <th>Set Date</th>
             <th>Status</th>
             <th>Confirm</th>
+            <th>Delete</th>
         </tr>
     </thead>
     <tbody class="bg-light text-dark">
@@ -179,7 +216,21 @@ if (!$result) {
                     <button class='btn btn-secondary' disabled>Confirmed</button>
                 <?php } ?>
             </td>
+            <td>
+                <a href="javascript:void(0);" 
+                   onclick="confirmDelete(<?php echo $product_id; ?>);" 
+                   class="btn btn-danger">Delete</a>
+            </td>
         </tr>
     <?php } ?>
     </tbody>
 </table>
+
+<script type="text/javascript">
+    function confirmDelete(productId) {
+        if (confirm("Are you sure you want to delete this product?")) {
+            // Redirect to a PHP script that will handle the deletion
+            window.location = "ads_pending.php?delete_product_id=" + productId;
+        }
+    }
+</script>
