@@ -29,9 +29,6 @@ if (isset($_GET['confirm_product_id'])) {
         if ($result_details->num_rows > 0) {
             $product = $result_details->fetch_assoc();
 
-            // Debugging: Check if `product_image1` and other details are retrieved correctly
-            echo "<script>console.log('Product details fetched:', " . json_encode($product) . ");</script>";
-
             // Step 2: Insert the fetched product data into the `products` table
             $insert_product_query = "
                 INSERT INTO products (
@@ -84,18 +81,11 @@ if (isset($_GET['confirm_product_id'])) {
             // Execute and check for errors
             if (!$stmt_insert->execute()) {
                 echo "<script>console.log('Error in product insertion: " . $stmt_insert->error . "');</script>";
-                echo "<script>console.log('Data passed for product insertion: " . json_encode($product) . "');</script>";
-            } else {
-                echo "<script>console.log('Product inserted successfully. Product Image 1: " . $product['product_image1'] . "');</script>";
             }
 
             // Step 3: Mark the product as confirmed in `orders_pending`
             $update_status_query = "UPDATE orders_pending SET status = 1 WHERE product_id = ?";
             $stmt_update_status = $con->prepare($update_status_query);
-
-            if (!$stmt_update_status) {
-                die("Prepare failed: " . $con->error);
-            }
 
             $stmt_update_status->bind_param("i", $product_id);
             $stmt_update_status->execute();
@@ -157,10 +147,11 @@ if (isset($_GET['delete_product_id'])) {
     }
 }
 
-// Fetch all pending orders (for displaying in the table)
+// Fetch all pending orders (for displaying in the table) with descending order
 $get_products = "
     SELECT product_id, title, product_image1, product_email, product_contact, 
-           date, set_date, status FROM orders_pending";
+           date, set_date, status FROM orders_pending
+    ORDER BY date DESC";  // Change this line to sort by date in descending order
 $result = mysqli_query($con, $get_products);
 
 if (!$result) {
