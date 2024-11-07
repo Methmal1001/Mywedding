@@ -29,6 +29,9 @@ if (isset($_GET['confirm_product_id'])) {
         if ($result_details->num_rows > 0) {
             $product = $result_details->fetch_assoc();
 
+            // Debugging: Check if `product_image1` and other details are retrieved correctly
+            echo "<script>console.log('Product details fetched:', " . json_encode($product) . ");</script>";
+
             // Step 2: Insert the fetched product data into the `products` table
             $insert_product_query = "
                 INSERT INTO products (
@@ -60,14 +63,14 @@ if (isset($_GET['confirm_product_id'])) {
 
             // Bind the fetched data directly to the insert query
             $stmt_insert->bind_param(
-                "isssiiissssdssi",
+                "isssiisssssdssi",
                 $product['product_id'], 
                 $product['product_title'], 
                 $product['product_description'], 
                 $product['product_keywords'], 
                 $product['category_id'], 
                 $product['brand_id'], 
-                $product['product_image1'], 
+                $product['product_image1'],  
                 $product['product_image2'], 
                 $product['product_image3'], 
                 $product['product_email'], 
@@ -78,7 +81,13 @@ if (isset($_GET['confirm_product_id'])) {
                 $product['status']
             );
 
-            $stmt_insert->execute();
+            // Execute and check for errors
+            if (!$stmt_insert->execute()) {
+                echo "<script>console.log('Error in product insertion: " . $stmt_insert->error . "');</script>";
+                echo "<script>console.log('Data passed for product insertion: " . json_encode($product) . "');</script>";
+            } else {
+                echo "<script>console.log('Product inserted successfully. Product Image 1: " . $product['product_image1'] . "');</script>";
+            }
 
             // Step 3: Mark the product as confirmed in `orders_pending`
             $update_status_query = "UPDATE orders_pending SET status = 1 WHERE product_id = ?";
