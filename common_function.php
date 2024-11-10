@@ -42,6 +42,54 @@ function getproducts(){
 }
 }
 
+
+
+// Getting most recent products
+/*
+
+// getting products
+function getproducts(){
+    global $con;
+
+    // check condition isset or not
+    if(!isset($_GET['category'])){
+        if(!isset($_GET['brand'])){
+
+            // Selecting the latest 10 added products based on the date column
+            $select_query = "SELECT * FROM products ORDER BY date DESC LIMIT 16";
+            $result_query = mysqli_query($con, $select_query);
+
+            while($row = mysqli_fetch_assoc($result_query)){
+                $product_id = $row['product_id'];
+                $product_title = $row['product_title'];
+                $product_description = $row['product_description'];
+                $product_image1 = $row['product_image1'];
+                $product_price = $row['product_price'];
+                $district = $row['district'];
+                $category_id = $row['category_id'];
+                $brand_id = $row['brand_id'];
+
+                echo "<div class='col-md-3 mb-5'>
+                    <div class='card'>
+                        <img src='./admin_area/product_images/$product_image1' class='card-img-top' alt='$product_title'>
+                        <div class='card-body'>
+                            <h5 class='card-title'>$product_title</h5>
+                            <p class='card-text'>$product_description</p>
+                            <p class='card-text'>Price: Rs.$product_price/-</p>
+                            <p class='card-text'>District $district</p>
+                            <a href='product_details.php?product_id=$product_id' class='btn btn-info'>View more</a>
+                        </div>
+                    </div>
+                </div>";
+            }
+        }
+    }
+}
+
+*/
+
+
+
 // getting all products
 function get_all_products(){
     global $con;
