@@ -406,9 +406,9 @@ if (isset($_POST['insert_product'])) {
         exit();
     } else {
         // Store uploaded images within the local machine file
-        move_uploaded_file($temp_image1, "../admin_area/product_images/$product_image1");
-        move_uploaded_file($temp_image2, "../admin_area/product_images/$product_image2");
-        move_uploaded_file($temp_image3, "../admin_area/product_images/$product_image3");
+        move_uploaded_file($temp_image1, "./admin_area/product_images/$product_image1");
+        move_uploaded_file($temp_image2, "./admin_area/product_images/$product_image2");
+        move_uploaded_file($temp_image3, "./admin_area/product_images/$product_image3");
 
         // Insert query for products
         $insert_products = "
