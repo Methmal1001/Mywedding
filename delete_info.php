@@ -96,7 +96,9 @@ try {
 
 // Fetch all pending orders for display
 $get_products = "SELECT product_id, title, product_image1, product_contact, product_email, date, set_date, status 
-                 FROM orders_pending";
+                 FROM orders_pending
+                 ORDER BY date DESC";
+
 $result = mysqli_query($con, $get_products);
 
 if (!$result) {
@@ -115,11 +117,10 @@ if (!$result) {
             <th>Contact</th>
             <th>Email</th>
             <th>Date</th>
-            <th>Set Date</th>
-            <th>Active</th>
             <th>Status</th>
             <th>Confirmation</th>
             <th>Delete</th>
+            <th>Active</th> <!-- Column to show the number of days, hours, and minutes -->
         </tr>
     </thead>
     <tbody class="bg-light text-dark">
@@ -130,19 +131,25 @@ if (!$result) {
         $product_image1 = $row['product_image1'];
         $product_contact = $row['product_contact'];
         $product_email = $row['product_email'];
-        $date = $row['date'];
-        $set_date = $row['set_date'];
+        $date = $row['date'];  // The product's insertion date
         $status = $row['status'] == 0 ? 'Pending' : 'Confirmed';
 
-        // Calculate active time
-        $current_time = new DateTime();
-        $set_date_time = new DateTime($set_date);
+        // Calculate the number of days, hours, and minutes since the product was inserted
+        $current_time = new DateTime();  // Get current date and time
+        $product_date = new DateTime($date); // Convert the product's insertion date to DateTime
+        $interval = $current_time->diff($product_date);  // Calculate the difference
 
-        $active_time = ($set_date_time < $current_time) ? 'Expired' : 
-            sprintf('%d days, %d hours, %d minutes left', 
-                $current_time->diff($set_date_time)->d, 
-                $current_time->diff($set_date_time)->h, 
-                $current_time->diff($set_date_time)->i);
+        $days_active = $interval->days;  // Number of days
+        $hours_active = $interval->h;   // Number of hours
+        $minutes_active = $interval->i; // Number of minutes
+
+        // Format the output with colors
+        $active_time = "<span style='color: blue;'>" . $days_active . " day" . ($days_active != 1 ? "s" : "") . "</span>";  // Apply red color to days
+        if ($hours_active > 0 || $minutes_active > 0) {
+            // Apply yellow color to hours
+            $active_time .= ", <span style='color: green;'>" . $hours_active . " hour" . ($hours_active != 1 ? "s" : "") . "</span>, " . $minutes_active . " minute" . ($minutes_active != 1 ? "s" : "");
+        }
+
     ?>
         <tr class='text-center <?php echo ($row['status'] == 0) ? 'table-warning' : 'table-success'; ?>'>
             <td><?php echo $product_id; ?></td>
@@ -155,14 +162,6 @@ if (!$result) {
             <td><?php echo $product_contact; ?></td>
             <td><?php echo $product_email; ?></td>
             <td><?php echo $date; ?></td>
-            <td>
-                <form action="" method="POST" class="form-inline">
-                    <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
-                    <input type="datetime-local" name="set_date" value="<?php echo $set_date; ?>" class="form-control mr-2" required>
-                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
-                </form>
-            </td>
-            <td><?php echo $active_time; ?></td>
             <td><?php echo $status; ?></td>
             <td>
                 <?php if ($row['status'] == 0) { ?>
@@ -178,6 +177,7 @@ if (!$result) {
                     <i class='fa-solid fa-trash'></i>
                 </button>
             </td>
+            <td><?php echo $active_time; ?></td> <!-- Display the active time (days, hours, minutes) -->
         </tr>
 
         <!-- Delete Confirmation Modal -->
